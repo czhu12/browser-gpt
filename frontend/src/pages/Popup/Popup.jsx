@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from '../../assets/img/logo.svg';
-import Greetings from '../../containers/Greetings/Greetings';
-import './Popup.css';
+import React, { useState, useEffect } from 'react';
+import { UserContext } from './UserContext';
+import ChatInterface from './components/ChatInterface';
+import "./Popup.css"
+import axios from 'axios';
+import Loading from './components/Loading';
 
+import { getAccessToken, putAccessToken } from '../../utils/storage';
+const configureAxios = (accessToken) => {
+  axios.defaults.headers.common = {
+    "Content-Type": "application/json",
+    "X-ACCESS-TOKEN": accessToken,
+  };
+
+  axios.interceptors.response.use(response => {
+    return response;
+  }, error => {
+    if (!error) return;
+    if (error.config?.method !== 'get' && error.response?.status === 401) {
+      const notyf = new Notyf();
+      notyf.error('You are not allowed to do that!');
+    }
+    throw error;
+  });
+}
 const Popup = () => {
+  const createOrLoadUser = async () => {
+    const accessToken = await getAccessToken();
+    if (!!accessToken.uuid) {
+      setAccessToken(accessToken.uuid);
+    } else {
+      const response = await axios.post(`http://localhost:3001/api/users`);
+      const accessToken = response.data;
+      await putAccessToken(accessToken);
+      setAccessToken(accessToken);
+    }
+    configureAxios(accessToken.uuid);
+  }
+  
+  const [accessToken, setAccessToken] = useState(null);
+  useEffect(() => {
+    // Bootstrap the user token if the storage doesn't have it
+    createOrLoadUser();
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/pages/Popup/Popup.jsx</code> and save to reload. Helllo!
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React!
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={{ accessToken: accessToken }}>
+      {!accessToken && <Loading />}
+      {accessToken && <ChatInterface />}
+    </UserContext.Provider>
   );
 };
 
