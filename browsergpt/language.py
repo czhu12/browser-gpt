@@ -25,7 +25,7 @@ class Chatbot:
         messages = [self._to_message_object(m) for m in self.thread.messages] + [HumanMessage(content=human_message.text)]
 
         ai_text = self.chat(messages)
-        ai_message = Message(text=str(ai_text), thread=self.thread, message_type=MessageType.AI)
+        ai_message = Message(text=ai_text.content, thread=self.thread, message_type=MessageType.AI)
         self.db.session.add(human_message)
         self.db.session.add(ai_message)
         self.db.session.commit()

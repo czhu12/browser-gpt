@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 load_dotenv()
-from langchain.chat_models import ChatOpenAI
 
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
