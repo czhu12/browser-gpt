@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   useQuery,
   useMutation,
@@ -14,11 +14,12 @@ import Message from './Message';
 const ChatInterface = () => {
   const [showThreadSideBar, setShowThreadSideBar] = useState(false);
   const [message, setMessage] = useState("");
+  const messagesEndRef = useRef(null);
 
   const queryClient = useQueryClient();
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-      console.log("enter not implemented yet!")
+      sendMessage();
     }
   };
 
@@ -53,9 +54,9 @@ const ChatInterface = () => {
 
   // Mutations
   const messageMutation = useMutation({
-    mutationFn: (data) => {
+    mutationFn: async (data) => {
       activeThreadMutation.mutate({id: data.threadId});
-      createMessage(data)
+      await createMessage(data)
     },
     onSuccess: () => {
       // Invalidate and refetch
@@ -66,6 +67,13 @@ const ChatInterface = () => {
   });
   const messages = threadData?.thread.messages || [];
 
+  // This function will be called whenever the component updates
+  useEffect(() => {
+    console.log("scrolling!")
+    //messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+  });
+
   return (
     <div className="App">
       <div className="chat-interface">
@@ -74,7 +82,10 @@ const ChatInterface = () => {
             <Col xs="auto">
               {showThreadSideBar && (
                 <ExpandableSidebar onClose={() => setShowThreadSideBar(false)}>
-                  <ThreadList onSelectThread={(thread) => activeThreadMutation.mutate(thread)} />
+                  <ThreadList onSelectThread={(thread) => {
+                    activeThreadMutation.mutate(thread);
+                    setShowThreadSideBar(false);
+                  }} />
                 </ExpandableSidebar>
               )}
               <button onClick={() => setShowThreadSideBar(!showThreadSideBar)}>=</button>
@@ -94,6 +105,9 @@ const ChatInterface = () => {
               <Message message={message} />
             );
           })}
+
+          { messageMutation.isLoading && <div className="my-3"><div className="spinner centered"></div></div> }
+          <div ref={messagesEndRef}></div>
         </div>
         <div className="footer">
           <InputGroup>

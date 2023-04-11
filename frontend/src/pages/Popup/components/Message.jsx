@@ -6,7 +6,7 @@ import ChatUserIcon from './ChatUserIcon';
 
 const Message = ({message}) => {
   return (
-    <Row className={`text-start ${message.message_type === "USER" ? "bg-secondary" : "bg-light"}`}>
+    <Row className={`py-3 text-start ${message.message_type === "USER" ? "bg-light" : ""}`}>
       <Col xs="auto">
         {message.message_type === "USER" ? <ChatUserIcon /> : <ChatGPTIcon />}
       </Col>

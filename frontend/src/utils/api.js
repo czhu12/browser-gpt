@@ -17,5 +17,6 @@ export async function getThread(threadId) {
 }
 
 export async function getThreads() {
-  return await axios.get(`${BASE_URL}/threads`);
+  const response = await axios.get(`${BASE_URL}/threads`);
+  return response.data;
 }
