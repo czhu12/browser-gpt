@@ -1,0 +1,46 @@
+$footer-height: 80px;
+$header-height: 50px;
+
+.App {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+}
+
+.header {
+  height: $header-height;
+  padding: 10px;
+  color: #555;
+}
+
+.footer {
+  height: $footer-height;
+  padding: 0 30px;
+  input, input:focus {
+    border: none;
+    padding-left: 25px;
+    /* https://getcssscan.com/css-box-shadow-examples */
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    height: 50px;
+  }
+}
+
+.main {
+  height: calc(600px - ($header-height + $footer-height));
+  overflow-y: scroll;
+  padding: 0 10px;
+}
+
+.thread-button {
+  border-radius: 5px;
+}
+
+.thread-button:hover {
+  border-radius: 5px;
+  background-color: var(--bs-gray);
+}

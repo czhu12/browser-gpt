@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserContext } from './UserContext';
 import ChatInterface from './components/ChatInterface';
-import "./Popup.css"
+import "./Popup.scss"
 import axios from 'axios';
 import Loading from './components/Loading';
 

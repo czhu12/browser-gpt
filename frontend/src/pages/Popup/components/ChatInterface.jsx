@@ -4,12 +4,14 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap"
+import { Col, Form, InputGroup, Row } from "react-bootstrap"
 import ExpandableSidebar from './ExpandableSidebar';
 import ThreadList from './ThreadList';
 import { createMessage, createThread, getThread } from '../../../utils/api';
 import { loadActiveThread, putActiveThread } from '../../../utils/storage';
 import Message from './Message';
+import AddIcon from './icons/AddIcon';
+import MenuIcon from './icons/MenuIcon';
 
 const ChatInterface = () => {
   const [showThreadSideBar, setShowThreadSideBar] = useState(false);
@@ -81,46 +83,54 @@ const ChatInterface = () => {
   return (
     <div className="App">
       <div className="chat-interface">
-        <div className="header">
-          <Row>
-            <Col xs="auto">
-              {showThreadSideBar && (
-                <ExpandableSidebar onClose={() => setShowThreadSideBar(false)}>
-                  <ThreadList onSelectThread={(thread) => {
-                    activeThreadMutation.mutate(thread);
-                    setShowThreadSideBar(false);
-                  }} />
-                </ExpandableSidebar>
-              )}
-              <button onClick={() => setShowThreadSideBar(!showThreadSideBar)}>=</button>
-            </Col>
-            <Col>
-              <div>{thread?.title || "New Chat"}</div>
-            </Col>
-            <Col xs="auto">
-              <button>+</button>
-            </Col>
-          </Row>
-        </div>
-        <div className="main">
-          {finalMessages.map((message) => {
-            return (
-              <Message message={message} />
-            );
-          })}
+        <div className={`${showThreadSideBar && "pointer"}`}
+          onClick={() => {
+            showThreadSideBar && setShowThreadSideBar(false);
+          }}>
+          <div className="header">
+            <Row>
+              <Col xs="auto">
+                {showThreadSideBar && (
+                  <ExpandableSidebar onClose={() => setShowThreadSideBar(false)}>
+                    <ThreadList onSelectThread={(thread) => {
+                      activeThreadMutation.mutate(thread);
+                      setShowThreadSideBar(false);
+                    }} />
+                  </ExpandableSidebar>
+                )}
+                <a className="text-dark" href="#" onClick={() => setShowThreadSideBar(!showThreadSideBar)}><MenuIcon /></a>
+              </Col>
+              <Col>
+                <div>{thread?.title || "New Chat"}</div>
+              </Col>
+              <Col xs="auto">
+                <a href="#" className="text-dark" onClick={() => {}}><AddIcon /></a>
+              </Col>
+            </Row>
+          </div>
+          <div
+            className="main"
+            onClick={() => {
+              showThreadSideBar && setShowThreadSideBar(false);
+            }}>
+            {finalMessages.map((message) => {
+              return (
+                <Message message={message} />
+              );
+            })}
 
-          <div ref={messagesEndRef}></div>
+            <div ref={messagesEndRef}></div>
+          </div>
         </div>
         <div className="footer">
           <InputGroup>
             <Form.Control
+              autoFocus
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
+              placeholder="write something"
             />
-            <Button variant="primary" onClick={sendMessage}>
-              Send
-            </Button>
           </InputGroup>
         </div>
       </div>

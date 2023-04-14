@@ -1,8 +1,8 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
-import ChatGPTIcon from './ChatGPTIcon';
-import ChatUserIcon from './ChatUserIcon';
+import ChatGPTIcon from './icons/ChatGPTIcon';
+import ChatUserIcon from './icons/ChatUserIcon';
 
 const Message = ({ message }) => {
   return (
