@@ -16,7 +16,7 @@ const ThreadItem = ({thread, onClick}) => {
   return  (
     <a href="#" onClick={onClick} className="link-unstyled">
       <div className="py-3 mb-1 thread-button">
-        Thread #{thread.id}
+        {thread.title || "New Chat"}
       </div>
     </a>
   )

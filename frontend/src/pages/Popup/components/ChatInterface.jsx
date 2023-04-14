@@ -14,6 +14,7 @@ import Message from './Message';
 const ChatInterface = () => {
   const [showThreadSideBar, setShowThreadSideBar] = useState(false);
   const [message, setMessage] = useState("");
+  const [pendingMessage, setPendingMessage] = useState("");
   const messagesEndRef = useRef(null);
 
   const queryClient = useQueryClient();
@@ -55,6 +56,7 @@ const ChatInterface = () => {
   // Mutations
   const messageMutation = useMutation({
     mutationFn: async (data) => {
+      setPendingMessage(data.text);
       activeThreadMutation.mutate({id: data.threadId});
       await createMessage(data)
     },
@@ -65,14 +67,16 @@ const ChatInterface = () => {
       }
     },
   });
-  const messages = threadData?.thread.messages || [];
+  const thread = threadData?.thread;
+  const messages = thread?.messages || [];
 
-  // This function will be called whenever the component updates
   useEffect(() => {
-    console.log("scrolling!")
-    //messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
   });
+  let finalMessages = messages;
+  if (messageMutation.isLoading) {
+    finalMessages = finalMessages.concat([{message_type: "USER", text: pendingMessage}, {status: "pending", message_type: "AI"}])
+  }
 
   return (
     <div className="App">
@@ -91,7 +95,7 @@ const ChatInterface = () => {
               <button onClick={() => setShowThreadSideBar(!showThreadSideBar)}>=</button>
             </Col>
             <Col>
-              Title of chat
+              <div>{thread?.title || "New Chat"}</div>
             </Col>
             <Col xs="auto">
               <button>+</button>
@@ -99,14 +103,12 @@ const ChatInterface = () => {
           </Row>
         </div>
         <div className="main">
-          {messages.map((message) => {
-            console.log(message);
+          {finalMessages.map((message) => {
             return (
               <Message message={message} />
             );
           })}
 
-          { messageMutation.isLoading && <div className="my-3"><div className="spinner centered"></div></div> }
           <div ref={messagesEndRef}></div>
         </div>
         <div className="footer">

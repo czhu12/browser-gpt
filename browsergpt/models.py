@@ -16,12 +16,13 @@ class Thread(db.Model):
     title = db.Column(db.String(128), nullable=False, default="")
     messages = db.relationship('Message', backref='thread')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    def serialize(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "messages": [message.serialize() for message in self.messages],
-        }
+
+    @staticmethod
+    def create_title(text):
+        if len(text) > 20:
+            return text[:20] + "..."
+        return text
+
 
 
 class MessageType(str, Enum):
@@ -34,11 +35,3 @@ class Message(db.Model):
     text = db.Column(db.Text(), nullable=False, default="")
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'))
     message_type = db.Column(db.Enum(MessageType), nullable=False)
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "text": self.text,
-            "message_type": self.message_type
-        }
-
