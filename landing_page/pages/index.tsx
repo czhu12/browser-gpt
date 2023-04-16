@@ -32,7 +32,7 @@ export default function Home() {
                 <li className="flex items-center">
                   <Checkmark />
                   <p className="ml-4">
-                    Let ChatGPT read and summarize what you&apos;re reading
+                    Let ChatGPT read and summarize what you're reading
                   </p>
                 </li>
                 <li className="flex items-center">
