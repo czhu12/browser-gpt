@@ -10,4 +10,4 @@ ENV FLASK_APP=app.py
 ENV FLASK_ENV=debug
 EXPOSE 5000
 
-CMD ["flask", "run", "-p", "3001", "--host=0.0.0.0"]
+CMD ["flask", "--app", "app", "run", "--debug", "--port", "3001", "--host=0.0.0.0"]

@@ -1,0 +1,5 @@
+set -e
+# Build docker container
+docker build -t chriszhu12/browsergpt .
+docker image push chriszhu12/browsergpt
+kubectl rollout restart deployments/flask

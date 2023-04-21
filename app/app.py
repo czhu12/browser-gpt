@@ -2,8 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from flask import Flask, request, jsonify
-from flask_migrate import Migrate
-from browsergpt.storage import db
+from browsergpt.storage import db, initialize_db
 from browsergpt.models import User, Thread, Message
 from browsergpt.authentication import authenticated
 from browsergpt.language import Chatbot
@@ -11,10 +10,7 @@ from browsergpt.serializers import ListSerializer, ThreadSerializer
 
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-
-db.init_app(app)
-migrate = Migrate(app, db)
+initialize_db(app, db)
 
 @app.route("/")
 def get_root():

@@ -12,15 +12,32 @@ spec:
       labels:
         app: flask
     spec:
+      initContainers:
+      - name: flask
+        image: chriszhu12/browsergpt:latest
+        imagePullPolicy: Always
+        command: ['flask', 'db', 'upgrade']
       containers:
       - name: flask
         image: chriszhu12/browsergpt:latest
+        imagePullPolicy: Always
         resources:
           limits:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "128m"
         ports:
         - containerPort: 3001
+        env:
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: openai-key
+        - name: SQLALCHEMY_DATABASE_URI
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
 ---
 apiVersion: v1
 kind: Service
