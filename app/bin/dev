@@ -1,1 +1,3 @@
+set -e
+
 docker run -it -v $(pwd):/app -p 3001:3001 browsergpt-dev $1

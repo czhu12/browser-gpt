@@ -27,11 +27,13 @@ marshmallow==3.19.0
 marshmallow-enum==1.5.1
 multidict==6.0.4
 mypy-extensions==1.0.0
+mysql-connector-python==8.0.33
 mysqlclient==2.1.1
 numpy==1.24.2
 openai==0.27.4
 openapi-schema-pydantic==1.2.4
 packaging==23.1
+protobuf==3.20.3
 pydantic==1.10.7
 python-dotenv==1.0.0
 PyYAML==6.0
