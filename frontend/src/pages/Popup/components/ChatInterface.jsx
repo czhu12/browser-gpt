@@ -53,7 +53,18 @@ const ChatInterface = () => {
     data: threadData,
     isFetching,
     isRefetching
-  } = useQuery({ queryKey: ['threads', (activeThread || {}).id], queryFn: () => getThread(activeThread.id), enabled: !!activeThread})
+  } = useQuery({
+    queryKey: ['threads', (activeThread || {}).id],
+    queryFn: () => getThread(activeThread.id),
+    enabled: !!activeThread,
+    onError: (error) => {
+      if (error.code === "ERR_BAD_RESPONSE") {
+        console.log("Changing thread to null");
+        activeThreadMutation.mutate(null);
+      }
+    }
+  })
+  console.log(isError);
 
   // Mutations
   const messageMutation = useMutation({
@@ -76,6 +87,7 @@ const ChatInterface = () => {
     messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
   });
   let finalMessages = messages;
+  finalMessages = finalMessages.concat([{message_type: "USER", text: pendingMessage}, {text: "And to remove a role for a user:\n\n```python\nuser = User.query.get(1)\nrole = Role.query.get(1)\nuser.roles.remove(role)\ndb.session.commit()\n```", message_type: "AI"}])
   if (messageMutation.isLoading) {
     finalMessages = finalMessages.concat([{message_type: "USER", text: pendingMessage}, {status: "pending", message_type: "AI"}])
   }

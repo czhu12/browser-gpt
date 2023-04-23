@@ -15,6 +15,12 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     uuid = db.Column(db.String(128), nullable=False)
 
+    threads = db.relationship(
+        'Thread',
+        backref='user',
+        primaryjoin='User.id == foreign(Thread.user_id)',
+    )
+
     @staticmethod
     def generate_uuid():
         return str(uuid.uuid4())
@@ -29,11 +35,10 @@ class Thread(db.Model):
     title = db.Column(db.String(128), nullable=False, default="")
     user_id = db.Column(db.Integer)
 
-    user = db.relationship(
-        'User',
-        backref='threads',
-        primaryjoin='Thread.user_id == foreign(User.id)',
-        foreign_keys=user_id,
+    messages = db.relationship(
+        'Message',
+        backref='thread',
+        primaryjoin='Thread.id == foreign(Message.thread_id)',
     )
 
     @staticmethod
@@ -52,10 +57,3 @@ class Message(db.Model):
     text = db.Column(db.Text(), nullable=False, default="")
     thread_id = db.Column(db.Integer)
     message_type = db.Column(db.Enum(MessageType), nullable=False)
-
-    user = db.relationship(
-        'Thread',
-        backref='messages',
-        primaryjoin='Message.thread_id == foreign(Thread.id)',
-        foreign_keys=thread_id,
-    )

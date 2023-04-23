@@ -4,6 +4,7 @@ import ChatInterface from './components/ChatInterface';
 import "./Popup.scss"
 import axios from 'axios';
 import Loading from './components/Loading';
+import { Notyf } from 'notyf';
 
 import { getAccessToken, putAccessToken } from '../../utils/storage';
 const configureAxios = (accessToken) => {
@@ -24,23 +25,47 @@ const configureAxios = (accessToken) => {
   });
 }
 const Popup = () => {
+  const createNewUser = async () => {
+    const response = await axios.post(`http://localhost:3001/api/users`);
+    const accessToken = response.data;
+    return accessToken;
+  };
+  const canConfirmAccessToken = async (accessToken) => {
+    try {
+      await axios.get(`http://localhost:3001/api/current_user`, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-ACCESS-TOKEN": accessToken.uuid,
+        }
+      })
+      return true
+    } catch(error) {
+      if (error?.response?.status === 401) {
+        return false
+      }
+      return true
+    }
+  }
   const createOrLoadUser = async () => {
     const accessToken = await getAccessToken();
-    if (!!accessToken.uuid) {
-      setAccessToken(accessToken.uuid);
+    const confirmed = !!accessToken && (await canConfirmAccessToken(accessToken));
+    if (confirmed) {
+      return accessToken
     } else {
-      const response = await axios.post(`http://localhost:3001/api/users`);
-      const accessToken = response.data;
-      await putAccessToken(accessToken);
-      setAccessToken(accessToken);
+      return await createNewUser()
     }
-    configureAxios(accessToken.uuid);
   }
   
   const [accessToken, setAccessToken] = useState(null);
+  const configureEverything = async () => {
+    const accessToken = await createOrLoadUser()
+    await putAccessToken(accessToken)
+    setAccessToken(accessToken.uuid)
+    configureAxios(accessToken.uuid)
+  }
   useEffect(() => {
     // Bootstrap the user token if the storage doesn't have it
-    createOrLoadUser();
+    configureEverything()
   }, []);
   return (
     <UserContext.Provider value={{ accessToken: accessToken }}>

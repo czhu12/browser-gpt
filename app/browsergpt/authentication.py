@@ -12,6 +12,8 @@ def authenticated(f):
         if not token: # throw error if no token provided
             return make_response(jsonify({"message": "A valid token is missing!"}), 401)
         current_user = User.query.filter(User.uuid == token).first()
+        if current_user is None:
+            return make_response(jsonify({"message": "A valid token is missing!"}), 401)
 
         return f(current_user, *args, **kwargs)
     return decorator
