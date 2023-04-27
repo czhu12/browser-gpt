@@ -6,7 +6,7 @@ import Popup from './Popup';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'animate.css/animate.min.css';
 import 'notyf/notyf.min.css'; // for React, Vue and Svelte
-import './index.css';
+import './index.scss';
 
 const container = document.getElementById('app-container');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript

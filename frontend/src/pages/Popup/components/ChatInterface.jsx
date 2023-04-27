@@ -64,19 +64,19 @@ const ChatInterface = () => {
       }
     }
   })
-  console.log(isError);
 
   // Mutations
   const messageMutation = useMutation({
     mutationFn: async (data) => {
       setPendingMessage(data.text);
       activeThreadMutation.mutate({id: data.threadId});
-      await createMessage(data)
+      return await createMessage(data)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       // Invalidate and refetch
       if (activeThread) {
-        queryClient.invalidateQueries({ queryKey: ['threads', activeThread.id] });
+        debugger;
+        queryClient.setQueryData(['threads', activeThread.id], data)
       }
     },
   });
@@ -87,7 +87,6 @@ const ChatInterface = () => {
     messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
   });
   let finalMessages = messages;
-  finalMessages = finalMessages.concat([{message_type: "USER", text: pendingMessage}, {text: "And to remove a role for a user:\n\n```python\nuser = User.query.get(1)\nrole = Role.query.get(1)\nuser.roles.remove(role)\ndb.session.commit()\n```", message_type: "AI"}])
   if (messageMutation.isLoading) {
     finalMessages = finalMessages.concat([{message_type: "USER", text: pendingMessage}, {status: "pending", message_type: "AI"}])
   }

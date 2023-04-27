@@ -10,11 +10,12 @@ import { a11yDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import CopyCodeButton from './CopyCodeButton';
 
 
-
 const Message = ({ message }) => {
   const Pre = ({ children }) => <pre className="blog-pre">
-    <CopyCodeButton>{children}</CopyCodeButton>
     {children}
+    <div className="mt-2">
+      <CopyCodeButton>{children}</CopyCodeButton>
+    </div>
   </pre>
 
   return (

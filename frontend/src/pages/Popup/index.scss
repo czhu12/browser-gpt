@@ -1,6 +1,8 @@
+@import "utilities/variables";
+
 body {
-  width: 600px;
-  height: 600px;
+  width: $width;
+  height: $height;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -46,6 +48,7 @@ code {
   color: inherit;
   text-decoration: inherit;
 }
+
 .pointer {
   cursor: pointer;
 }

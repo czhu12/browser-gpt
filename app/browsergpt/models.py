@@ -11,7 +11,7 @@ class MessageType(str, Enum):
 
 
 class User(db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     uuid = db.Column(db.String(128), nullable=False)
 

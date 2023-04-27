@@ -1,5 +1,4 @@
-$footer-height: 80px;
-$header-height: 50px;
+@import "utilities/variables";
 
 .App {
   position: absolute;
@@ -20,7 +19,7 @@ $header-height: 50px;
 
 .footer {
   height: $footer-height;
-  padding: 0 30px;
+  padding: 10px 30px;
   input, input:focus {
     border: none;
     padding-left: 25px;
@@ -31,9 +30,10 @@ $header-height: 50px;
 }
 
 .main {
-  height: calc(600px - ($header-height + $footer-height));
-  overflow-y: scroll;
+  height: calc($height - ($header-height + $footer-height));
+  overflow-y: auto;
   padding: 0 10px;
+  overflow-x: hidden;
 }
 
 .thread-button {
