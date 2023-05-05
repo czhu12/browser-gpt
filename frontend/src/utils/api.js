@@ -8,7 +8,7 @@ export async function createMessage({threadId, text}) {
 }
 
 export async function createThread() {
-  return await axios.post(`${BASE_URL}/threads`);
+  return await axios.post(`${BASE_URL}/threads/`);
 }
 
 export async function getThread(threadId) {

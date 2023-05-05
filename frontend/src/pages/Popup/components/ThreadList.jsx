@@ -23,7 +23,7 @@ const ThreadItem = ({thread, onClick}) => {
 }
 
 const ThreadList = ({onSelectThread}) => {
-  const { status, data, error, isFetching } = useQuery({ queryKey: ["thread-list"], queryFn: getThreads });
+  const { data } = useQuery({ queryKey: ["thread-list"], queryFn: getThreads });
   return (
     <div id="thread-list">
       <NewThread onClick={() => onSelectThread(null)} />

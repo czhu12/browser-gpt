@@ -34,7 +34,7 @@ const ChatInterface = () => {
     if (!currentActiveThread) {
       currentActiveThread = (await createThread()).data.thread;
       activeThreadMutation.mutate(currentActiveThread);
-      queryClient.invalidateQueries({ queryKey: ['activeThreadId'] });
+      //await queryClient.invalidateQueries({ queryKey: ['activeThreadId'] });
     }
     messageMutation.mutate({threadId: currentActiveThread.id, text: message});
   }
@@ -59,33 +59,32 @@ const ChatInterface = () => {
     enabled: !!activeThread,
     onError: (error) => {
       if (error.code === "ERR_BAD_RESPONSE") {
-        console.log("Changing thread to null");
         activeThreadMutation.mutate(null);
       }
     }
   })
 
+
   // Mutations
   const messageMutation = useMutation({
     mutationFn: async (data) => {
       setPendingMessage(data.text);
-      activeThreadMutation.mutate({id: data.threadId});
       return await createMessage(data)
     },
     onSuccess: (data) => {
       // Invalidate and refetch
       if (activeThread) {
-        debugger;
         queryClient.setQueryData(['threads', activeThread.id], data)
       }
     },
   });
+  useEffect(() => {
+    messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+  }, [activeThreadMutation.isLoading, threadData, messageMutation.isLoading]);
+
   const thread = threadData?.thread;
   const messages = thread?.messages || [];
 
-  useEffect(() => {
-    messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
-  });
   let finalMessages = messages;
   if (messageMutation.isLoading) {
     finalMessages = finalMessages.concat([{message_type: "USER", text: pendingMessage}, {status: "pending", message_type: "AI"}])
@@ -115,7 +114,7 @@ const ChatInterface = () => {
                 <div>{thread?.title || "New Chat"}</div>
               </Col>
               <Col xs="auto">
-                <a href="#" className="text-dark" onClick={() => {}}><AddIcon /></a>
+                <a href="#" className="text-dark" onClick={() => activeThreadMutation.mutate(null)}><AddIcon /></a>
               </Col>
             </Row>
           </div>
