@@ -1,15 +1,20 @@
+import os
+import time
 from langchain.chat_models import ChatOpenAI
-from browsergpt.models import MessageType, Message
-from time import sleep
 from langchain.schema import (
     AIMessage,
     HumanMessage,
     SystemMessage
 )
-import time
-import os
+from browsergpt.models import MessageType, Message
 
-TEST_CHAT = os.environ.get("TEST_CHAT")
+class MyCustomHandler():
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        print(f"My custom handler, token: {token}")
+    
+
+
+TEST_CHAT = os.environ.get("TEST_CHAT") == "1"
 
 class MockMessage():
   def __init__(self, content):
@@ -17,7 +22,6 @@ class MockMessage():
 
 class Chatbot:
     def __init__(self, thread, db):
-        self.chat = ChatOpenAI(temperature=0)
         self.db = db
         self.thread = thread
 
@@ -29,7 +33,8 @@ class Chatbot:
         elif message.message_type == MessageType.USER:
             return HumanMessage(content=message.text)
 
-    def respond_to(self, text):
+    def respond_to(self, text, callbacks=[]):
+        chat = ChatOpenAI(temperature=0, streaming=True, callbacks=callbacks)
         human_message = Message(text=text, thread=self.thread, message_type=MessageType.USER)
         messages = [self._to_message_object(m) for m in self.thread.messages] + [HumanMessage(content=human_message.text)]
 
@@ -37,7 +42,7 @@ class Chatbot:
           time.sleep(1)
           ai_text = MockMessage("-- Test --")
         else:
-          ai_text = self.chat(messages)
+          ai_text = chat(messages)
 
         ai_message = Message(text=ai_text.content, thread=self.thread, message_type=MessageType.AI)
         self.db.session.add(human_message)

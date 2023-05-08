@@ -7,13 +7,25 @@ import {
 import { Col, Form, InputGroup, Row } from "react-bootstrap"
 import ExpandableSidebar from './ExpandableSidebar';
 import ThreadList from './ThreadList';
-import { createMessage, createThread, getThread } from '../../../utils/api';
+import { BASE_URL, createMessage, createThread, getThread } from '../../../utils/api';
 import { loadActiveThread, putActiveThread } from '../../../utils/storage';
 import Message from './Message';
 import AddIcon from './icons/AddIcon';
 import MenuIcon from './icons/MenuIcon';
+import io from "socket.io-client";
 
 const ChatInterface = () => {
+  useEffect(() => {
+    console.log("Trying to connect to http://localhost:3001")
+    const socket = io("http://localhost:3001");
+    socket.on('connect', function() {
+      console.log("Hello!!!!");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.log(`connect_error due to ${err.message}`);
+    });
+  }, [])
   const [showThreadSideBar, setShowThreadSideBar] = useState(false);
   const [message, setMessage] = useState("");
   const [pendingMessage, setPendingMessage] = useState("");

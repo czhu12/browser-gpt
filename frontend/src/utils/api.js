@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3001/api";
+export const BASE_URL = "http://localhost:3001/api";
 
 export async function createMessage({threadId, text}) {
   const response = await axios.post(`${BASE_URL}/threads/${threadId}/messages`, { text });

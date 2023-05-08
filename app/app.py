@@ -1,20 +1,31 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, request, jsonify
+
+from flask import Flask, request, jsonify, render_template
 from browsergpt.storage import db, initialize_db
 from browsergpt.models import User, Thread, Message
 from browsergpt.authentication import authenticated
 from browsergpt.language import Chatbot
+from browsergpt.realtime import SocketIOCallback
 from browsergpt.serializers import ListSerializer, ThreadSerializer
+from flask_socketio import SocketIO, emit
 
 
 app = Flask(__name__)
 initialize_db(app, db)
 
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+@socketio.on('send_message')   
+def message_recieved(data):
+    print(data['text'])
+    emit('message_from_server', {'text':'Message recieved!'})
+
 @app.route("/")
 def get_root():
-    return f"Users: {User.query.count()} | Threads: {Thread.query.count()} | Messages: {Message.query.count()}"
+    return render_template('index.html', username="Czhu12")
 
 @app.route("/api/users", methods=["POST"])
 def create_user():
@@ -39,6 +50,8 @@ def get_threads(current_user):
 @authenticated
 def get_thread(current_user, thread_id):
     thread = Thread.query.filter_by(user=current_user, id=thread_id).first()
+    if thread is None:
+        return jsonify({ "error": "Thread not found" }), 404
     return jsonify({ "thread": ThreadSerializer(thread).serialize() })
 
 @app.route("/api/threads/", methods=["POST"])
@@ -59,7 +72,7 @@ def create_message(current_user, thread_id):
       db.session.add(thread)
       db.session.commit()
     chatbot = Chatbot(thread, db)
-    chatbot.respond_to(payload['text'])
+    chatbot.respond_to(payload['text'], callbacks=[SocketIOCallback(socketio, thread)])
 
     return jsonify({ "thread": ThreadSerializer(thread).serialize() })
 
@@ -68,3 +81,8 @@ def create_summary_message(chat_id):
     payload = request.get_json(force=True)
     # Extract the message from the payload
     payload["message"]
+
+
+
+if __name__ == "__main__":
+    socketio.run(app, debug=True, port=3001)
