@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-
+import click
 from flask import Flask, request, jsonify, render_template
 from browsergpt.storage import db, initialize_db
 from browsergpt.models import User, Thread, Message
@@ -9,7 +9,7 @@ from browsergpt.authentication import authenticated
 from browsergpt.language import Chatbot
 from browsergpt.realtime import SocketIOCallback
 from browsergpt.serializers import ListSerializer, ThreadSerializer
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 
 
 app = Flask(__name__)
@@ -18,14 +18,9 @@ initialize_db(app, db)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-@socketio.on('send_message')   
-def message_recieved(data):
-    print(data['text'])
-    emit('message_from_server', {'text':'Message recieved!'})
-
 @app.route("/")
 def get_root():
-    return render_template('index.html', username="Czhu12")
+    return render_template('index.html', users_count=User.query.count(), threads_count=Thread.query.count(), messages_count=Message.query.count())
 
 @app.route("/api/users", methods=["POST"])
 def create_user():
@@ -84,5 +79,11 @@ def create_summary_message(chat_id):
 
 
 
+@click.command()
+@click.option('--port', default=3001, help='port to run the app on')
+@click.option('--debug', '-d', default=True, is_flag=True, help="Debug mode enabled")
+def main(port, debug):
+    socketio.run(app, port=port, debug=debug)
+
 if __name__ == "__main__":
-    socketio.run(app, debug=True, port=3001)
+    main()

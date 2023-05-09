@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import {
   useQuery,
   useMutation,
@@ -13,23 +13,21 @@ import Message from './Message';
 import AddIcon from './icons/AddIcon';
 import MenuIcon from './icons/MenuIcon';
 import io from "socket.io-client";
+import { UserContext } from '../UserContext';
 
+let socket;
 const ChatInterface = () => {
-  useEffect(() => {
-    console.log("Trying to connect to http://localhost:3001")
-    const socket = io("http://localhost:3001");
-    socket.on('connect', function() {
-      console.log("Hello!!!!");
-    });
-
-    socket.on("connect_error", (err) => {
-      console.log(`connect_error due to ${err.message}`);
-    });
-  }, [])
+  const { accessToken } = useContext(UserContext);
   const [showThreadSideBar, setShowThreadSideBar] = useState(false);
   const [message, setMessage] = useState("");
-  const [pendingMessage, setPendingMessage] = useState("");
+  const [pendingMessage, _setPendingMessage] = useState({user: '', ai: ''});
   const messagesEndRef = useRef(null);
+  const pendingMessageRef = useRef(pendingMessage);
+  const connected = useState(false);
+  const setPendingMessage = (newPendingMessage) => {
+    pendingMessageRef.current = newPendingMessage
+    _setPendingMessage(pendingMessageRef.current)
+  }
 
   const queryClient = useQueryClient();
   const handleKeyDown = (event) => {
@@ -76,11 +74,26 @@ const ChatInterface = () => {
     }
   })
 
+  useEffect(() => {
+    socket = io(BASE_URL);
+    socket.on('connect', function() {
+      console.log("Connected to socket");
+    });
 
+    socket.on("connect_error", (err) => {
+      console.log(`connect_error due to ${err.message}`);
+    });
+    socket.addEventListener(`/user/${accessToken}`, onIncomingSocketMessage);
+  }, [])
+  const onIncomingSocketMessage = (data) => {
+    const newPendingMessage = { ...pendingMessageRef.current }
+    newPendingMessage.ai += JSON.parse(data).payload.token
+    setPendingMessage(newPendingMessage)
+  }
   // Mutations
   const messageMutation = useMutation({
     mutationFn: async (data) => {
-      setPendingMessage(data.text);
+      setPendingMessage({user: data.text, ai: ''});
       return await createMessage(data)
     },
     onSuccess: (data) => {
@@ -92,14 +105,17 @@ const ChatInterface = () => {
   });
   useEffect(() => {
     messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
-  }, [activeThreadMutation.isLoading, threadData, messageMutation.isLoading]);
+  }, [activeThreadMutation.isLoading, threadData, messageMutation.isLoading, pendingMessage]);
 
   const thread = threadData?.thread;
   const messages = thread?.messages || [];
 
   let finalMessages = messages;
   if (messageMutation.isLoading) {
-    finalMessages = finalMessages.concat([{message_type: "USER", text: pendingMessage}, {status: "pending", message_type: "AI"}])
+    finalMessages = finalMessages.concat([
+      { message_type: "USER", text: pendingMessageRef.current.user},
+      { message_type: "AI", text: pendingMessageRef.current.ai }
+    ])
   }
 
   return (
@@ -123,7 +139,10 @@ const ChatInterface = () => {
                 <a className="text-dark" href="#" onClick={() => setShowThreadSideBar(!showThreadSideBar)}><MenuIcon /></a>
               </Col>
               <Col>
-                <div>{thread?.title || "New Chat"}</div>
+                <div>
+                  {thread?.title || "New Chat"}
+                  {connected && <span className="text-success">·</span>}
+                </div>
               </Col>
               <Col xs="auto">
                 <a href="#" className="text-dark" onClick={() => activeThreadMutation.mutate(null)}><AddIcon /></a>
