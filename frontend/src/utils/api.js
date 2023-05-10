@@ -1,7 +1,21 @@
 import axios from "axios";
 
-export const BASE_URL = "http://localhost:3001";
-export const API_URL = "http://localhost:3001/api";
+export const BASE_URL = "https://backend.browsergpt.app";
+export const API_URL = `${BASE_URL}/api`;
+
+export async function getCurrentUser(uuid) {
+  return await axios.get(`${API_URL}/current_user`, {
+    headers: {
+      "Content-Type": "application/json",
+      "X-ACCESS-TOKEN": uuid,
+    }
+  })
+};
+export async function createNewUser() {
+  const response = await axios.post(`${API_URL}/users/`);
+  const accessToken = response.data;
+  return accessToken;
+};
 
 export async function createMessage({threadId, text}) {
   const response = await axios.post(`${API_URL}/threads/${threadId}/messages`, { text });

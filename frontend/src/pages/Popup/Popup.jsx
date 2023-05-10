@@ -7,6 +7,7 @@ import Loading from './components/Loading';
 import { Notyf } from 'notyf';
 
 import { getAccessToken, putAccessToken } from '../../utils/storage';
+import { createNewUser, getCurrentUser } from '../../utils/api';
 const configureAxios = (accessToken) => {
   axios.defaults.headers.common = {
     "Content-Type": "application/json",
@@ -25,19 +26,9 @@ const configureAxios = (accessToken) => {
   });
 }
 const Popup = () => {
-  const createNewUser = async () => {
-    const response = await axios.post(`http://localhost:3001/api/users`);
-    const accessToken = response.data;
-    return accessToken;
-  };
   const canConfirmAccessToken = async (accessToken) => {
     try {
-      await axios.get(`http://localhost:3001/api/current_user`, {
-        headers: {
-          "Content-Type": "application/json",
-          "X-ACCESS-TOKEN": accessToken.uuid,
-        }
-      })
+      await getCurrentUser(accessToken.uuid)
       return true
     } catch(error) {
       if (error?.response?.status === 401) {

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: flask
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: flask
@@ -12,19 +12,14 @@ spec:
       labels:
         app: flask
     spec:
-      initContainers:
-      - name: flask
-        image: chriszhu12/browsergpt:latest
-        imagePullPolicy: Always
-        command: ['flask', 'db', 'upgrade']
       containers:
       - name: flask
         image: chriszhu12/browsergpt:latest
         imagePullPolicy: Always
         resources:
           limits:
-            memory: "256Mi"
-            cpu: "128m"
+            memory: "1Gi"
+            cpu: "256m"
         ports:
         - containerPort: 3001
         env:

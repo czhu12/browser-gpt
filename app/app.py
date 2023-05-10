@@ -81,9 +81,11 @@ def create_summary_message(chat_id):
 
 @click.command()
 @click.option('--port', default=3001, help='port to run the app on')
-@click.option('--debug', '-d', default=True, is_flag=True, help="Debug mode enabled")
-def main(port, debug):
-    socketio.run(app, port=port, debug=debug)
+@click.option('--host', default="0.0.0.0", help='host to run the app on')
+@click.option('--debug', '-d', default=False, is_flag=True, help="Debug mode enabled")
+def main(port, host, debug):
+    print(f"Starting application on {host}:{port}")
+    socketio.run(app, host=host, port=port, debug=debug)
 
 if __name__ == "__main__":
     main()
