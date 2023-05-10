@@ -12,7 +12,7 @@ export async function getCurrentUser(uuid) {
   })
 };
 export async function createNewUser() {
-  const response = await axios.post(`${API_URL}/users/`);
+  const response = await axios.post(`${API_URL}/users`);
   const accessToken = response.data;
   return accessToken;
 };
@@ -23,7 +23,7 @@ export async function createMessage({threadId, text}) {
 }
 
 export async function createThread() {
-  return await axios.post(`${API_URL}/threads/`);
+  return await axios.post(`${API_URL}/threads`);
 }
 
 export async function getThread(threadId) {

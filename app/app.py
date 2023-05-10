@@ -49,7 +49,7 @@ def get_thread(current_user, thread_id):
         return jsonify({ "error": "Thread not found" }), 404
     return jsonify({ "thread": ThreadSerializer(thread).serialize() })
 
-@app.route("/api/threads/", methods=["POST"])
+@app.route("/api/threads", methods=["POST"])
 @authenticated
 def create_new_thread(current_user):
     thread = Thread(user=current_user)

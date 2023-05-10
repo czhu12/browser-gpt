@@ -83,6 +83,7 @@ const ChatInterface = () => {
     socket.on("connect_error", (err) => {
       console.log(`connect_error due to ${err.message}`);
     });
+    socket.off(`/user/${accessToken}`);
     socket.addEventListener(`/user/${accessToken}`, onIncomingSocketMessage);
   }, [])
   const onIncomingSocketMessage = (data) => {
