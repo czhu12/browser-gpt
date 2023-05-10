@@ -1,10 +1,7 @@
 import React from 'react';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
-import { Col, Row } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
-import ChatGPTIcon from './icons/ChatGPTIcon';
-import ChatUserIcon from './icons/ChatUserIcon';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { a11yDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import CopyCodeButton from './CopyCodeButton';
@@ -19,11 +16,8 @@ const Message = ({ message }) => {
   </pre>
 
   return (
-    <Row className={`py-3 text-start ${message.message_type === "USER" ? "bg-light" : ""}`}>
-      <Col xs="auto">
-        {message.message_type === "USER" ? <ChatUserIcon /> : <ChatGPTIcon />}
-      </Col>
-      <Col xs={10}>
+    <div className={`py-3 text-start ${message.message_type === "USER" ? "bg-light" : ""}`}>
+      <div className="px-4">
         {message.status === "pending" && (
           <div className="my-3"><div className="spinner centered"></div></div>
         )}
@@ -58,8 +52,8 @@ const Message = ({ message }) => {
             {message.text}
           </ReactMarkdown>
         )}
-      </Col>
-    </Row>
+      </div>
+    </div>
   );
 }
 export default Message;
