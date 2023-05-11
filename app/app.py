@@ -12,7 +12,7 @@ from browsergpt.serializers import ListSerializer, ThreadSerializer
 from flask_socketio import SocketIO
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='web/static', template_folder='web/templates')
 initialize_db(app, db)
 
 app.config['SECRET_KEY'] = 'secret!'
@@ -20,7 +20,13 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route("/")
 def get_root():
-    return render_template('index.html', users_count=User.query.count(), threads_count=Thread.query.count(), messages_count=Message.query.count())
+    return render_template(
+        'index.html',
+        users_count=User.query.count(),
+        threads_count=Thread.query.count(),
+        messages_count=Message.query.count(),
+        chrome_url="https://chrome.google.com/webstore/detail/imtranslator-translator-d/noaijdpnepcgjemiklgfkcfbkokogabh?hl=en"
+    )
 
 @app.route("/api/users", methods=["POST"])
 def create_user():
