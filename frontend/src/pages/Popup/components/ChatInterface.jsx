@@ -14,6 +14,7 @@ import AddIcon from './icons/AddIcon';
 import MenuIcon from './icons/MenuIcon';
 import io from "socket.io-client";
 import { UserContext } from '../UserContext';
+import OnlineStatus from './icons/OnlineStatus';
 
 let socket;
 const ChatInterface = () => {
@@ -23,7 +24,7 @@ const ChatInterface = () => {
   const [pendingMessage, _setPendingMessage] = useState({user: '', ai: ''});
   const messagesEndRef = useRef(null);
   const pendingMessageRef = useRef(pendingMessage);
-  const connected = useState(false);
+  const [connected, setConnected] = useState(false);
   const setPendingMessage = (newPendingMessage) => {
     pendingMessageRef.current = newPendingMessage
     _setPendingMessage(pendingMessageRef.current)
@@ -78,6 +79,7 @@ const ChatInterface = () => {
     socket = io(BASE_URL);
     socket.on('connect', function() {
       console.log("Connected to socket");
+      setConnected(true);
     });
 
     socket.on("connect_error", (err) => {
@@ -142,7 +144,6 @@ const ChatInterface = () => {
               <Col>
                 <div>
                   {thread?.title || "New Chat"}
-                  {connected && <span className="text-success">·</span>}
                 </div>
               </Col>
               <Col xs="auto">
