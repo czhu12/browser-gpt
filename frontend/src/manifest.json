@@ -1,15 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Browser GPT",
-  "description": "A gpt agent directly in your browser",
-  "options_page": "options.html",
+  "name": "BrowserGPT",
+  "description": "A ChatGPT agent directly in your browser",
   "background": { "service_worker": "background.bundle.js" },
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon-34.png"
-  },
-  "chrome_url_overrides": {
-    "newtab": "newtab.html"
   },
   "icons": {
     "128": "icon-128.png"
