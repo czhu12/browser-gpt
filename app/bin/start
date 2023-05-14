@@ -1,1 +1,1 @@
-flask --app app run --debug -p 3001 -h localhost
+python app.py --debug

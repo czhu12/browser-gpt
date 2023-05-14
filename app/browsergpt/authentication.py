@@ -1,4 +1,4 @@
-from flask import request, jsonify, make_response
+from flask import request, jsonify, make_response, abort
 from functools import wraps
 from browsergpt.models import User
 
@@ -16,4 +16,17 @@ def authenticated(f):
             return make_response(jsonify({"message": "A valid token is missing!"}), 401)
 
         return f(current_user, *args, **kwargs)
+    return decorator
+
+def raise_404_if_none(obj):
+    if obj is None:
+        abort(404)
+
+def http_handlers(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            return make_response(jsonify({"message": str(e)}), 500)
     return decorator

@@ -17,6 +17,11 @@ export async function createNewUser() {
   return accessToken;
 };
 
+export async function createDocument(threadId, content) {
+  const response = await axios.post(`${API_URL}/threads/${threadId}/documents`, { content });
+  return response.data;
+}
+
 export async function createMessage({threadId, text}) {
   const response = await axios.post(`${API_URL}/threads/${threadId}/messages`, { text });
   return response.data;

@@ -4,8 +4,8 @@ load_dotenv()
 import click
 from flask import Flask, request, jsonify, render_template
 from browsergpt.storage import db, initialize_db
-from browsergpt.models import User, Thread, Message
-from browsergpt.authentication import authenticated
+from browsergpt.models import User, Thread, Message, Document
+from browsergpt.authentication import authenticated, raise_404_if_none
 from browsergpt.language import Chatbot
 from browsergpt.realtime import SocketIOCallback
 from browsergpt.serializers import ListSerializer, ThreadSerializer
@@ -67,6 +67,7 @@ def create_new_thread(current_user):
 @authenticated
 def create_message(current_user, thread_id):
     thread = Thread.query.filter_by(user=current_user, id=thread_id).first()
+    raise_404_if_none(thread)
     payload = request.get_json(force=True)
     if not thread.title:
       thread.title = Thread.create_title(payload['text'])
@@ -77,11 +78,19 @@ def create_message(current_user, thread_id):
 
     return jsonify({ "thread": ThreadSerializer(thread).serialize() })
 
-@app.route("/api/chats/<int:chat_id>/read", methods=["POST"])
-def create_summary_message(chat_id):
+@app.route("/api/threads/<int:thread_id>/documents", methods=["POST"])
+@authenticated
+def create_document(current_user, thread_id):
+    thread = Thread.query.filter_by(user=current_user, id=thread_id).first()
+    raise_404_if_none(thread)
     payload = request.get_json(force=True)
-    # Extract the message from the payload
-    payload["message"]
+    if not thread.title:
+      document = Document(content=payload['content'], thread=thread)
+      # Create document vector in background?
+      db.session.add(document)
+      db.session.commit()
+
+    return jsonify({ "thread": ThreadSerializer(thread).serialize() })
 
 
 

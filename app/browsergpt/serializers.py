@@ -24,7 +24,21 @@ class ThreadSerializer(AbstractSerializer):
       "id": self.thread.id,
       "title": self.thread.title,
       "messages": [MessageSerializer(message).serialize() for message in self.thread.messages],
+      "documents": [DocumentSerializer(document).serialize() for document in self.thread.document],
     }
+
+class DocumentSerializer(AbstractSerializer):
+  def __init__(self, document, expanded=False):
+    self.document = document
+    self.expanded = expanded
+
+  def serialize(self):
+    data = {
+      "id": self.document.id,
+    }
+    if self.expanded:
+      data['content'] = self.document.content
+    return data
 
 class MessageSerializer(AbstractSerializer):
   def __init__(self, message):

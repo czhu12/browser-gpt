@@ -1,32 +1,34 @@
 import React from 'react';
+import { Card } from "react-bootstrap"
 
-const Command = ({onClick}) => {
+export const COMMAND_SUMMARIZE_WEB_PAGE = "summarize_web_page";
+const COMMANDS = [
+  {
+    key: COMMAND_SUMMARIZE_WEB_PAGE,
+    name: "Summarize",
+  },
+]
+
+const CommandCard = ({command, onClick}) => {
   return (
-    <a href="#" onClick={onClick} className="link-unstyled">
+    <a href="#" onClick={() => onClick(command)} className="link-unstyled">
       <Card className="bg-transparent border border-white py-3 mb-1 thread-button">
-        New Thread
+        {command.name}
       </Card>
     </a>
   )
 }
 
-export const COMMANDS = [
-  {
-    key: "summarize_web_page",
-    name: "Summarize",
-  },
-  {
-    key: "summarize_web_page",
-    name: "Summarize",
-  },
-  {
-    key: "summarize_web_page",
-    name: "Summarize",
-  }
-]
-const Commands = ({onSelectThread}) => {
-  return <div>
-
+const Commands = ({onClick}) => {
+  return <div className="commands">
+    {COMMANDS.map((command) => {
+      return (
+        <CommandCard
+          command={command}
+          onClick={onClick}
+        />
+      )
+    })}
   </div>
 };
 

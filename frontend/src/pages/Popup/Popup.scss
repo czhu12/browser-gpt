@@ -17,9 +17,14 @@
   color: #555;
 }
 
+.commands {
+}
+
 .footer {
   height: $footer-height;
   padding: 10px 30px;
+  position: relative;
+
   input, input:focus {
     border: none;
     padding-left: 25px;

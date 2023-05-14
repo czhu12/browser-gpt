@@ -15,6 +15,7 @@ import MenuIcon from './icons/MenuIcon';
 import io from "socket.io-client";
 import { UserContext } from '../UserContext';
 import OnlineStatus from './icons/OnlineStatus';
+import NewChat from './NewChat';
 
 let socket;
 const ChatInterface = () => {
@@ -124,7 +125,8 @@ const ChatInterface = () => {
   return (
     <div className="App">
       <div className="chat-interface">
-        <div className={`${showThreadSideBar && "pointer"}`}
+        <div
+          className={`${showThreadSideBar && "pointer"}`}
           onClick={() => {
             showThreadSideBar && setShowThreadSideBar(false);
           }}>
@@ -155,12 +157,18 @@ const ChatInterface = () => {
             className="main"
             onClick={() => {
               showThreadSideBar && setShowThreadSideBar(false);
-            }}>
-            {finalMessages.map((message) => {
-              return (
-                <Message message={message} />
-              );
-            })}
+            }}
+          >
+            {!activeThread && <NewChat />}
+            {activeThread && (
+              <div>
+                {finalMessages.map((message) => {
+                  return (
+                    <Message message={message} />
+                  );
+                })}
+              </div>
+            )}
 
             <div ref={messagesEndRef}></div>
           </div>
