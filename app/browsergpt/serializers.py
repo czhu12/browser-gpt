@@ -24,7 +24,7 @@ class ThreadSerializer(AbstractSerializer):
       "id": self.thread.id,
       "title": self.thread.title,
       "messages": [MessageSerializer(message).serialize() for message in self.thread.messages],
-      "documents": [DocumentSerializer(document).serialize() for document in self.thread.document],
+      "documents": [DocumentSerializer(document).serialize() for document in self.thread.documents],
     }
 
 class DocumentSerializer(AbstractSerializer):

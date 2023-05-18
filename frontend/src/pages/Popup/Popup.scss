@@ -25,7 +25,8 @@
   padding: 10px 30px;
   position: relative;
 
-  input, input:focus {
+  #chat-input, #chat-input:focus {
+    resize: none;
     border: none;
     padding-left: 25px;
     /* https://getcssscan.com/css-box-shadow-examples */

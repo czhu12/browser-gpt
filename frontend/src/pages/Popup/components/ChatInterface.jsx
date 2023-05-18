@@ -7,7 +7,7 @@ import {
 import { Col, Form, InputGroup, Row } from "react-bootstrap"
 import ExpandableSidebar from './ExpandableSidebar';
 import ThreadList from './ThreadList';
-import { BASE_URL, createMessage, createThread, getThread } from '../../../utils/api';
+import { BASE_URL, createDocument, createMessage, createThread, getThread } from '../../../utils/api';
 import { loadActiveThread, putActiveThread } from '../../../utils/storage';
 import Message from './Message';
 import AddIcon from './icons/AddIcon';
@@ -16,6 +16,10 @@ import io from "socket.io-client";
 import { UserContext } from '../UserContext';
 import OnlineStatus from './icons/OnlineStatus';
 import NewChat from './NewChat';
+import Commands, { COMMAND_SUMMARIZE_WEB_PAGE } from './Commands';
+import { extractContentFromPage } from '../../../utils/chrome';
+import TextareaAutosize from 'react-textarea-autosize';
+
 
 let socket;
 const ChatInterface = () => {
@@ -23,6 +27,7 @@ const ChatInterface = () => {
   const [showThreadSideBar, setShowThreadSideBar] = useState(false);
   const [message, setMessage] = useState("");
   const [pendingMessage, _setPendingMessage] = useState({user: '', ai: ''});
+  const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const pendingMessageRef = useRef(pendingMessage);
   const [connected, setConnected] = useState(false);
@@ -33,22 +38,48 @@ const ChatInterface = () => {
 
   const queryClient = useQueryClient();
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
       sendMessage();
     }
   };
 
   const { data: activeThread } = useQuery({ queryKey: ['activeThreadId'], queryFn: loadActiveThread });
 
-  const sendMessage = async () => {
+  const createThreadIfNotExists = async () => {
     let currentActiveThread = activeThread;
-    setMessage("");
     if (!currentActiveThread) {
       currentActiveThread = (await createThread()).data.thread;
       activeThreadMutation.mutate(currentActiveThread);
       //await queryClient.invalidateQueries({ queryKey: ['activeThreadId'] });
     }
+    return currentActiveThread;
+  }
+
+  const [inputDisabled, setInputDisabled] = useState(false);
+  const sendDocument = async (content) => {
+    setInputDisabled(true);
+    let currentActiveThread = await createThreadIfNotExists();
+    createDocument(currentActiveThread.id, content);
+    setInputDisabled(false);
+  }
+
+  const sendMessage = async () => {
+    setMessage("");
+    let currentActiveThread = await createThreadIfNotExists();
     messageMutation.mutate({threadId: currentActiveThread.id, text: message});
+  }
+
+  const onHotAction = async (command) => {
+    if (command.key === COMMAND_SUMMARIZE_WEB_PAGE) {
+      const response = await extractContentFromPage();
+      const content = response.content;
+      if (content) {
+        sendDocument(content)
+      } else {
+        alert("No content to summarize")
+      }
+    }
   }
 
   const activeThreadMutation = useMutation({
@@ -61,10 +92,7 @@ const ChatInterface = () => {
 
   // Queries
   const {
-    isError,
     data: threadData,
-    isFetching,
-    isRefetching
   } = useQuery({
     queryKey: ['threads', (activeThread || {}).id],
     queryFn: () => getThread(activeThread.id),
@@ -159,7 +187,7 @@ const ChatInterface = () => {
               showThreadSideBar && setShowThreadSideBar(false);
             }}
           >
-            {!activeThread && <NewChat />}
+            {!activeThread && <NewChat></NewChat>}
             {activeThread && (
               <div>
                 {finalMessages.map((message) => {
@@ -175,10 +203,16 @@ const ChatInterface = () => {
         </div>
         <div className="footer">
           <InputGroup>
-            <Form.Control
+            <TextareaAutosize
+              id="chat-input"
+              className="form-control"
+              disabled={inputDisabled}
               autoFocus
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              ref={inputRef}
+              onChange={(e) => {
+                setMessage(e.target.value)
+              }}
               onKeyDown={handleKeyDown}
               placeholder="write something"
             />

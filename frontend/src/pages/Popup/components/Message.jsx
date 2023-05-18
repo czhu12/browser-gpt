@@ -27,10 +27,9 @@ const Message = ({ message }) => {
             linkTarget='_blank'
             rehypePlugins={[rehypeRaw]}
             remarkPlugins={[remarkGfm]}
-
             components={{
               pre: Pre,
-              code({ node, inline, className = "blog-code", children, ...props }) {
+              code({ node, inline, className = "language-code", children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '')
                 return !inline && match ? (
                   <SyntaxHighlighter
@@ -49,7 +48,7 @@ const Message = ({ message }) => {
               }
             }}
           >
-            {message.text}
+            {message.text.replace(/\n/g, "  \n")}
           </ReactMarkdown>
         )}
       </div>
