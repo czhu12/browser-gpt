@@ -23,5 +23,6 @@
       "matches": []
     }
   ],
-  "permissions": ["storage", "activeTab"]
+  "permissions": ["storage", "activeTab"],
+  "version": "5.0.5"
 }

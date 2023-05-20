@@ -1,4 +1,5 @@
 import json
+import uuid
 from langchain.callbacks.base import BaseCallbackHandler
 
 class SocketIOCallback(BaseCallbackHandler):
@@ -11,7 +12,10 @@ class SocketIOCallback(BaseCallbackHandler):
         message = {"thread_id": self.thread.id, "token": token}
         self.socketio.emit(
             self.channel,
-            json.dumps({ "payload": message }),
+            json.dumps({
+                "payload": message,
+                "uuid": str(uuid.uuid4()),
+            }),
         )
         self.socketio.sleep(0)
 

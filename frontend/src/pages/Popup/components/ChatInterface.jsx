@@ -22,6 +22,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 
 
 let socket;
+let segmentIds = {};
 const ChatInterface = () => {
   const { accessToken } = useContext(UserContext);
   const [showThreadSideBar, setShowThreadSideBar] = useState(false);
@@ -117,10 +118,15 @@ const ChatInterface = () => {
     socket.off(`/user/${accessToken}`);
     socket.addEventListener(`/user/${accessToken}`, onIncomingSocketMessage);
   }, [])
+
   const onIncomingSocketMessage = (data) => {
-    const newPendingMessage = { ...pendingMessageRef.current }
-    newPendingMessage.ai += JSON.parse(data).payload.token
-    setPendingMessage(newPendingMessage)
+    const chunk = JSON.parse(data);
+    if (!(chunk.uuid in segmentIds)) {
+      const newPendingMessage = { ...pendingMessageRef.current }
+      newPendingMessage.ai += chunk.payload.token
+      setPendingMessage(newPendingMessage)
+      segmentIds[chunk.uuid] = true
+    }
   }
   // Mutations
   const messageMutation = useMutation({
@@ -177,7 +183,11 @@ const ChatInterface = () => {
                 </div>
               </Col>
               <Col xs="auto">
-                <a href="#" className="text-dark" onClick={() => activeThreadMutation.mutate(null)}><AddIcon /></a>
+                {
+                  thread && (
+                    <a href="#" className="text-dark" onClick={() => activeThreadMutation.mutate(null)}><AddIcon /></a>
+                  )
+                }
               </Col>
             </Row>
           </div>
