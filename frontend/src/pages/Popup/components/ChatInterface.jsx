@@ -16,7 +16,7 @@ import io from "socket.io-client";
 import { UserContext } from '../UserContext';
 import OnlineStatus from './icons/OnlineStatus';
 import NewChat from './NewChat';
-import Commands, { COMMAND_SUMMARIZE_WEB_PAGE } from './Commands';
+import Commands, { COMMAND_READ_WEB_PAGE } from './Commands';
 import { extractContentFromPage } from '../../../utils/chrome';
 import TextareaAutosize from 'react-textarea-autosize';
 
@@ -72,7 +72,7 @@ const ChatInterface = () => {
   }
 
   const onHotAction = async (command) => {
-    if (command.key === COMMAND_SUMMARIZE_WEB_PAGE) {
+    if (command.key === COMMAND_READ_WEB_PAGE) {
       const response = await extractContentFromPage();
       const content = response.content;
       if (content) {
@@ -212,6 +212,7 @@ const ChatInterface = () => {
           </div>
         </div>
         <div className="footer">
+          <Commands onClick={onHotAction} />
           <InputGroup>
             <TextareaAutosize
               id="chat-input"

@@ -64,5 +64,6 @@ class Message(TimeStampedIdModel):
     )
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     text = db.Column(db.Text(), nullable=False, default="")
+    #text_with_prompt = db.Column(db.Text(), nullable=False, default="")
     thread_id = db.Column(db.Integer, db.ForeignKey('threads.id'))
     message_type = db.Column(db.Enum(MessageType), nullable=False)

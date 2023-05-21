@@ -6,9 +6,10 @@ from flask import Flask, request, jsonify, render_template
 from browsergpt.storage import db, initialize_db
 from browsergpt.models import User, Thread, Message, Document
 from browsergpt.authentication import authenticated, raise_404_if_none
-from browsergpt.language import Chatbot
+from browsergpt.language import Chatbot, create_annoy_index
 from browsergpt.realtime import SocketIOCallback
 from browsergpt.serializers import ListSerializer, ThreadSerializer
+from langchain.schema import Document as LangchainDocument
 from flask_socketio import SocketIO
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -41,15 +42,17 @@ basic_auth.check_credentials = check_credentials
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def get_root():
-    return render_template(
-        'index.html',
-        users_count=User.query.count(),
-        threads_count=Thread.query.count(),
-        messages_count=Message.query.count(),
-        chrome_url="https://chrome.google.com/webstore/detail/imtranslator-translator-d/noaijdpnepcgjemiklgfkcfbkokogabh?hl=en"
-    )
+    return render_template('index.html')
+
+@app.route("/test", methods=["POST"])
+def submit_test():
+    document = request.form.get('document')
+    query = request.form.get('query')
+    annoy_index = create_annoy_index([LangchainDocument(page_content=document)])
+    relevant_documents = annoy_index.similarity_search(query)
+    return render_template('test.html', relevant_documents=relevant_documents)
 
 @app.route("/api/users", methods=["POST"])
 def create_user():

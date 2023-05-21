@@ -1,26 +1,26 @@
 import React from 'react';
-import { Card } from "react-bootstrap"
+import { Badge, Card } from "react-bootstrap"
 
-export const COMMAND_SUMMARIZE_WEB_PAGE = "summarize_web_page";
+export const COMMAND_READ_WEB_PAGE = "READ_WEB_PAGE";
 const COMMANDS = [
   {
-    key: COMMAND_SUMMARIZE_WEB_PAGE,
-    name: "Summarize",
+    key: COMMAND_READ_WEB_PAGE,
+    name: "Read",
   },
 ]
 
 const CommandCard = ({command, onClick}) => {
   return (
-    <a href="#" onClick={() => onClick(command)} className="link-unstyled">
-      <Card className="bg-transparent border border-white py-3 mb-1 thread-button">
+    <Badge>
+      <a href="#" onClick={() => onClick(command)} className="link-unstyled">
         {command.name}
-      </Card>
-    </a>
+      </a>
+    </Badge>
   )
 }
 
 const Commands = ({onClick}) => {
-  return <div className="commands">
+  return <div className="commands text-start">
     {COMMANDS.map((command) => {
       return (
         <CommandCard
